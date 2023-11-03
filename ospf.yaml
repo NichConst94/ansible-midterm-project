@@ -1,0 +1,24 @@
+---
+- name: Configure OSPFv2
+  hosts: CSR1kv
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: Configure OSPFv2
+      ios_config:
+        lines:
+          - router ospf 1
+          - router-id 1.1.1.1
+          - network 172.16.0.0 0.0.0.255 area 0
+
+    - name: Show IP Protocols
+      ios_command:
+        commands:
+          - show ip protocols
+      register: output
+
+    - name: Save Output to TXT File
+      copy: 
+        content: "{{ output.stdout[0] }}"
+        dest: "ip-protocols.txt"

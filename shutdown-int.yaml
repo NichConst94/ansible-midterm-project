@@ -1,0 +1,24 @@
+---
+- name: Shutdown Interface
+  hosts: CSR1kv
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: Shutdown Loopback Interface
+      ios_config:
+        parents: "interface Loopback0"
+        lines:
+          - interface Loopback0
+          - shutdown
+
+    - name: Show IP Interface Brief
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: output
+
+    - name: Save Output to TXT File
+      copy: 
+        content: "{{ output.stdout[0] }}"
+        dest: "int-shutdown.txt"

@@ -1,0 +1,24 @@
+---
+- name: Create Loopback
+  hosts: CSR1kv
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: Create and Assign IP Address to Loopback Interface
+      ios_config:
+        parents: "interface Loopback0"
+        lines:
+          - interface Loopback0
+          - ip address 172.16.0.1 255.255.255.0
+
+    - name: Show IP Interface Brief
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: output
+
+    - name: Save Output to TXT File
+      copy: 
+        content: "{{ output.stdout[0] }}"
+        dest: "ip-config.txt"

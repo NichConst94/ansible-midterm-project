@@ -1,0 +1,23 @@
+---
+- name: Create Extended ACL to Permit HTTP
+  hosts: CSR1kv
+  gather_facts: no
+  connection: local
+
+  tasks:
+    - name: Configure Extended ACL
+      ios_config:
+        lines:
+          - ip access-list extended PERMIT-HTTP
+          - permit tcp 192.168.0.0 0.0.0.255 host 192.168.17.128 eq 80
+
+    - name: Show ACLs in running-config
+      ios_command:
+        commands:
+          - show running-config | s PERMIT-HTTP
+      register: output
+
+    - name: Save Output to TXT File
+      copy: 
+        content: "{{ output.stdout[0] }}"
+        dest: "http-acl.txt"
